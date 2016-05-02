@@ -1,0 +1,43 @@
+#!/usr/bin/env php
+<?php
+define('INIT_APP', microtime());
+define('ROOT_PATH', rtrim(strtr(dirname(dirname(__FILE__)), '\\', '/'), '/') . '/');
+define('INPHINIT_PATH', ROOT_PATH . 'system/');
+define('INPHINIT_COMPOSER', false);
+define('INPHINIT_FALLBACK', false);
+
+require_once INPHINIT_PATH . 'boot/autoload.php';
+
+if (Experimental\Shell::cli() === false) {
+    echo 'It\'s not allowed in webservers';
+    exit;
+}
+
+function callArgs($data)
+{
+    /*
+    $call = $data[0];
+    array_shift($data);
+    */
+
+    /*
+    purity update packages || -up (import composer packages)
+    purity create apache   || -ca (create .htaccess)
+    purity create ngnix    || -cn (create ngnix config)
+    purity server 8000     || -s 8000 (initiate stand-alone server)
+    purity info            || -i (info from configs)
+    */
+
+    print_r($data);
+    echo PHP_EOL;
+}
+
+$cmd = new Experimental\Shell;
+
+if ($cmd->hasArgs()) {
+    callArgs($cmd->arguments());
+} else {
+    $cmd->inputObserver(function($response) {
+        callArgs(explode(' ', $response));
+    });
+}

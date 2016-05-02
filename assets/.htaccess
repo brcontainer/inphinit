@@ -1,0 +1,8 @@
+<FilesMatch "\.(?i:txt|html|css|js|json|svg|ico|apng|png|jpg|jpe|jpeg|otf|ttf|woff|eot)$">
+    <IfModule mod_expires.c>
+        ExpiresActive On
+        ExpiresDefault "access plus 1 year"
+    </IfModule>
+
+    FileETag None
+</FilesMatch>
