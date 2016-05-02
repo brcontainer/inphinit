@@ -9,14 +9,14 @@ PHP framework, routes, controllers and views
 
   ```
   cd c:\wamp\www\
-  composer create-project brcontainer/inphinit [project_name]
+  composer create-project brcontainer/inphinit:dev-master [project_name]
   ```
 
 1. Or (if no using Wamp/Xampp/easyphp)
 
     ```
     cd c:\Users\[username]\Documents\
-    composer create-project brcontainer/inphinit [project_name]
+    composer create-project brcontainer/inphinit:dev-master [project_name]
     ```
 
 1. Install in Unix-like:
@@ -30,7 +30,7 @@ PHP framework, routes, controllers and views
 
     ```
     cd /etc/www/
-    php composer.phar create-project brcontainer/inphinit [project_name]
+    php composer.phar create-project brcontainer/inphinit:dev-master [project_name]
     ```
 
 # Apache
