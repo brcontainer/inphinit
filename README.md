@@ -104,16 +104,16 @@ For setup access `[project_name]/system/application/Config/config.php` with your
 
 For check requeriments navigate with your web-browser to `http://localhost:8000/check.php` or `http://localhost/[project_name]/check.php`
 
-# Ngnix
+# Nginx
 
 For create Ngnix config run with terminal:
 
 ```
 cd /home/[project_name]/
-php check.php
+php generate-nginx.php
 ```
 
-And copy content to clipboard and adjust `ngnix.conf`
+And copy content to clipboard and adjust `nginx.conf`
 
 # IIS
 
