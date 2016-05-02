@@ -1,5 +1,5 @@
 {
-    "name": "Inphinit Framework",
+    "name": "brcontainer/inphinit",
     "description": "A framework for easy creation of routes",
     "keywords": [ "framework" ],
     "license": "MIT",
