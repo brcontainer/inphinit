@@ -78,7 +78,7 @@ class Request
             return '';
         }
 
-        return $_SERVER['QUERY_STRING'];
+        return isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : false;
     }
 
     public static function get($key, $alternative = false)
