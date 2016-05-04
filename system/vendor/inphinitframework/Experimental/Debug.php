@@ -28,18 +28,22 @@ class Debug
 
         self::$displayErrors = ini_get('display_errors');
 
-        error_reporting(0);
+        ini_set('display_errors', '0');
 
-        App::on('error',     array( 'Experimental\\Debug', 'error' ));
-        App::on('terminate', array( 'Experimental\\Debug', 'performance' ));
-        App::on('terminate', array( 'Experimental\\Debug', 'classes' ));
+        App::on('error',     array( '\\Experimental\\Debug', 'error' ));
+        App::on('terminate', array( '\\Experimental\\Debug', 'performance' ));
+        App::on('terminate', array( '\\Experimental\\Debug', 'classes' ));
     }
 
     public static function unregister()
     {
-        App::off('error',     array( 'Experimental\\Debug', 'error' ));
-        App::off('terminate', array( 'Experimental\\Debug', 'performance' ));
-        App::off('terminate', array( 'Experimental\\Debug', 'classes' ));
+        if (self::$initiate === false) {
+            return false;
+        }
+
+        App::off('error',     array( '\\Experimental\\Debug', 'error' ));
+        App::off('terminate', array( '\\Experimental\\Debug', 'performance' ));
+        App::off('terminate', array( '\\Experimental\\Debug', 'classes' ));
 
         ini_set('display_errors', self::$displayErrors);
 
@@ -77,8 +81,8 @@ class Debug
 
         if (preg_match('#(.*?)\((\d+)\) : eval\(\)\'d code$#', trim($file), $match)) {
             $oFile = $match[1] . ' : eval():' . $line;
-            $file = $match[1];
-            $line = $match[2];
+            $file  = $match[1];
+            $line  = $match[2];
         }
 
         View::render(self::$views['error'], array(

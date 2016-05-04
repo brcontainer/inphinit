@@ -69,6 +69,7 @@ class File
         }
 
         $buffer = '';
+
         for ($i = 0; $i < $size; ++$i) {
             if (isset($data[$i])) {
                 $buffer .= sprintf('%08b', ord($data[$i]));

@@ -18,11 +18,6 @@ class Exception extends \Exception
         parent::__construct($message, $code);
     }
 
-    public static function put($message, $code, $file, $line)
-    {
-        throw new Exception($message, $code, $file, $line);
-    }
-
     public static function auto($message, $level = 1, $code = E_USER_ERROR)
     {
         $data = Debug::caller($level);

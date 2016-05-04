@@ -125,11 +125,9 @@ class App
     {
         self::config('config');
 
-        //error_reporting(self::env('developer') === true ? E_ALL|E_STRICT : 0);
         error_reporting(E_ALL|E_STRICT);
         ini_set('display_errors', self::env('developer') === true ? '1' : '0');
 
-        register_shutdown_function('UtilsShutDown');
         set_error_handler(array('\\Inphinit\\App', 'triggerError'), E_ALL|E_STRICT);
     }
 

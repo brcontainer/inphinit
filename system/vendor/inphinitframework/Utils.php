@@ -45,8 +45,8 @@ function UtilsStatusCode($code = null)
 
         $currentStatus = 200;
 
-        if (preg_match('#/RESERVED\.INPHINIT\-(\d{3})\.html$#',
-                empty($_SERVER['PHP_SELF']) ? '' : $_SERVER['PHP_SELF'], $match) > 0)
+        if (empty($_SERVER['PHP_SELF']) === false &&
+            preg_match('#/RESERVED\.INPHINIT\-(\d{3})\.html$#', $_SERVER['PHP_SELF'], $match) > 0)
         {
             $currentStatus = (int) $match[1];
         }
@@ -143,3 +143,5 @@ function UtilsAutoload()
         }
     });
 }
+
+register_shutdown_function('UtilsShutDown');
