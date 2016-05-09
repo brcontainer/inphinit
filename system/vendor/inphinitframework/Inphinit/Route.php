@@ -17,14 +17,9 @@ class Route
     private static $matched;
     private static $cController;
     private static $cVerb;
-    private static $prefixNS = '';
 
-    public static function ns($ns)
-    {
-        if (is_string($ns) && preg_match('#[^a-z0-9\-_\\]#', $ns) === false) {
-            $prefixNS = rtrim($ns) . '\\';
-        }
-    }
+    protected static $prefixNS = '';
+    protected static $prefixPath = '';
 
     public static function invalid($action)
     {
@@ -63,7 +58,8 @@ class Route
         } elseif (ctype_alpha($method) && is_string($path) && (
             $action !== null || is_string($action)
         )) {
-            self::$httpRoutes[strtoupper(trim($method)) . ' ' . $path] = $action;
+            $verb = strtoupper(trim($method)) . ' ' . self::$prefixPath . $path;
+            self::$httpRoutes[$verb] = self::$prefixNS . $action;
         }
     }
 
@@ -135,7 +131,7 @@ class Route
         }
 
         if ($func !== false) {
-            self::$cController = self::$prefixNS . $func;
+            self::$cController = $func;
             self::$cVerb = $verb;
         } else {
             self::$cController = false;

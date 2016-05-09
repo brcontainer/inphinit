@@ -9,8 +9,12 @@
  * Navigate to: http://[your website]/generate-htaccess.php
  */
 
-if (PHP_SAPI === 'cli' || PHP_SAPI === 'cli-server' || empty($_SERVER['SERVER_SOFTWARE']) ||
-    stripos($_SERVER['SERVER_SOFTWARE'], 'apache') === false) {
+if (
+    PHP_SAPI === 'cli' ||
+    PHP_SAPI === 'cli-server' ||
+    empty($_SERVER['SERVER_SOFTWARE']) ||
+    stripos($_SERVER['SERVER_SOFTWARE'], 'apache') === false
+) {
     echo 'Use this script only with Apache';
     exit;
 }

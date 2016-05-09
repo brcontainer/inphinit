@@ -44,24 +44,6 @@ class App
         return self::$preventDuplicateError !== '';
     }
 
-    public static function triggerError($type, $message, $file = 'Unknown', $line = 0, $details = null)
-    {
-        if (class_exists('\\Inphinit\\View', false) && (E_ERROR === $type || E_PARSE === $type)) {
-            View::forceRender();
-        }
-
-        $str  = '?' . $file . ':' . $line . '?';
-
-        if (empty(self::$events['error']) === false && is_string($message) &&
-            strpos(self::$preventDuplicateError, $str) === false)
-        {
-            self::$preventDuplicateError .= $str;
-            self::trigger('error', array($type, $message, $file, $line, $details));
-        }
-
-        return false;
-    }
-
     public static function trigger($event, array $args = array())
     {
         if (empty(self::$events[$event])) {
@@ -127,8 +109,6 @@ class App
 
         error_reporting(E_ALL|E_STRICT);
         ini_set('display_errors', self::env('developer') === true ? '1' : '0');
-
-        set_error_handler(array('\\Inphinit\\App', 'triggerError'), E_ALL|E_STRICT);
     }
 
     public static function exec()

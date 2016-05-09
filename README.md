@@ -48,8 +48,9 @@ The reason I created this framework was to try to achieve a good performance and
 #Getting start
 
 1. Have two method for install
-1. First method, download [Composer](http://getcomposer.org/doc/00-intro.md)
-1. Install in Windows:
+1. First method is using composers
+1. Download [Composer](http://getcomposer.org/doc/00-intro.md) and install
+1. For create an project in Windows:
 
   ```
   cd c:\wamp\www\
@@ -73,7 +74,7 @@ The reason I created this framework was to try to achieve a good performance and
 1. Or (if no using Apache)
 
     ```
-    cd /etc/www/
+    cd /home/
     php composer.phar create-project brcontainer/inphinit:dev-master [project_name]
     ```
 
@@ -123,12 +124,14 @@ The reason I created this framework was to try to achieve a good performance and
 
 1. In folder `[project_name]/system/` find `main.php` and put something like this:
 
+    ```php
     Route::set('GET', '/foo', 'MyController:action');
+    ```
 
 1. In `[project_name]/system/application/Controller/` folder create an file with this name `MyController.php` (case sensitive)
 1. Put this content:
 
-    ```
+    ```php
     <?php
     namespace Controller;
 
@@ -146,7 +149,7 @@ The reason I created this framework was to try to achieve a good performance and
 
 1. In `[project_name]/system/application/View/` create file with this name `myview.php` (case sensitive) and put:
 
-    ```
+    ```php
     <p><?php echo $foo, ' ', $baz; ?></p>
     ```
 
@@ -156,14 +159,14 @@ The reason I created this framework was to try to achieve a good performance and
 
 For setup access `[project_name]/system/application/Config/config.php` with your text editor and change `developer` key to `true` or `false`:
 
-    ```
-    <?php
-    return array(
-        'appdata_expires' => 86400,
-        'developer'       => true,
-        'maintenance'     => false
-    );
-    ```
+```php
+<?php
+return array(
+    'appdata_expires' => 86400,
+    'developer'       => true,
+    'maintenance'     => false
+);
+```
 
 #Checking webserver requirements
 

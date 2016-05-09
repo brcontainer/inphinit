@@ -34,12 +34,9 @@ class Request
 
             case 'pjax':
                 return strcasecmp(self::header('X-PJAX'), 'true') === 0;
-
-            default:
-                return strcasecmp($_SERVER['REQUEST_METHOD'], $check) === 0;
         }
 
-        return false;
+        return strcasecmp($_SERVER['REQUEST_METHOD'], $check) === 0;
     }
 
     public static function header($name = null)

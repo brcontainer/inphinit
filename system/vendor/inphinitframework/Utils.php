@@ -7,6 +7,8 @@
  * Released under the MIT license
  */
 
+use Inphinit\App;
+
 function UtilsCaseSensitivePath($path)
 {
     return $path === strtr(realpath($path), '\\', '/');
@@ -27,11 +29,11 @@ function UtilsShutDown()
     $e = error_get_last();
 
     if ($e !== null) {
-        Inphinit\App::triggerError($e['type'], $e['message'], $e['file'], $e['line']);
+        UtilsError($e['type'], $e['message'], $e['file'], $e['line'], null);
         $e = null;
     }
 
-    Inphinit\App::trigger('terminate');
+    App::trigger('terminate');
 }
 
 function UtilsStatusCode($code = null)
@@ -144,4 +146,25 @@ function UtilsAutoload()
     });
 }
 
+function UtilsError($type, $message, $file, $line, $details)
+{
+    static $preventDuplicate;
+
+    if (class_exists('\\Inphinit\\View', false) && (E_ERROR === $type || E_PARSE === $type)) {
+        Inphinit\View::forceRender();
+    }
+
+    $str  = '?' . $file . ':' . $line . '?';
+
+    if (is_string($message)) {
+        if ($preventDuplicate === null && strpos($preventDuplicate, $str) === false) {
+            $preventDuplicate .= $str;
+            App::trigger('error', array($type, $message, $file, $line, $details));
+        }
+    }
+
+    return false;
+}
+
 register_shutdown_function('UtilsShutDown');
+set_error_handler('UtilsError', E_ALL|E_STRICT);

@@ -11,16 +11,18 @@ namespace Experimental;
 
 class Exception extends \Exception
 {
-    public function __construct($message, $code, $file, $line) {
+    public function setup($file, $line)
+    {
         $this->line = $line;
         $this->file = $file;
-
-        parent::__construct($message, $code);
     }
 
-    public static function auto($message, $level = 1, $code = E_USER_ERROR)
+    public static function raise($message, $level = 1, $type = E_USER_ERROR)
     {
         $data = Debug::caller($level);
-        throw new Exception($message, $code, $data['file'], $data['line']);
+        $e = new Exception($message, $type);
+        $e->setup($data['file'], $data['line']);
+
+        throw $e;
     }
 }
