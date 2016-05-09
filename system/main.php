@@ -4,7 +4,8 @@
  */
 
 use Inphinit\App;
-use Inphinit\Route;
+use Inphinit\Routing\Route;
+
 use Experimental\Debug;
 
 if (App::env('developer') === true) {

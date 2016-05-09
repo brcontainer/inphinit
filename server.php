@@ -2,7 +2,7 @@
 if (PHP_SAPI !== 'cli-server') {
     header('Content-Type: text/plain', true, 500);
     echo 'server.php is not allowed with "', PHP_SAPI, '", use a command like this:', PHP_EOL,
-            'php -S localhost:8000 server.php', PHP_EOL;
+            'php -S localhost:9000 server.php', PHP_EOL;
     exit;
 }
 

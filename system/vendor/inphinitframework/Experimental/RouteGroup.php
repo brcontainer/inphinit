@@ -10,9 +10,9 @@
 namespace Experimental;
 
 use Inphinit\App;
-use Inphinit\Route;
+use Inphinit\Routing\Router;
 
-class RouteGroup extends Route
+class RouteGroup extends Router
 {
     protected static $prefixPath;
 

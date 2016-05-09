@@ -7,9 +7,9 @@
  * Released under the MIT license
  */
 
-namespace Inphinit;
+namespace Inphinit\Routing;
 
-class Route
+class Route extends Router
 {
     private static $statusRoutes = array();
     private static $httpRoutes = array();
@@ -17,9 +17,6 @@ class Route
     private static $matched;
     private static $cController;
     private static $cVerb;
-
-    protected static $prefixNS = '';
-    protected static $prefixPath = '';
 
     public static function invalid($action)
     {
@@ -58,8 +55,8 @@ class Route
         } elseif (ctype_alpha($method) && is_string($path) && (
             $action !== null || is_string($action)
         )) {
-            $verb = strtoupper(trim($method)) . ' ' . self::$prefixPath . $path;
-            self::$httpRoutes[$verb] = self::$prefixNS . $action;
+            $verb = strtoupper(trim($method)) . ' ' . parent::$prefixPath . $path;
+            self::$httpRoutes[$verb] = parent::$prefixNS . $action;
         }
     }
 

@@ -9,6 +9,8 @@
 
 namespace Inphinit;
 
+use Inphinit\Routing\Route;
+
 class App
 {
     private static $cpath;
@@ -130,7 +132,7 @@ class App
             if ($mainController) {
                 $parsed = explode(':', $mainController, 2);
 
-                $mainController = 'Controller\\' . strtr($parsed[0], '.', '\\');
+                $mainController = '\\Controller\\' . strtr($parsed[0], '.', '\\');
                 $action = $parsed[1];
 
                 $run = new $mainController;
