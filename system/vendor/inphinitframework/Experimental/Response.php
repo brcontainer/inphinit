@@ -17,12 +17,12 @@ class Response
     public function xml($root, $data, $charset = 'UTF-8')
     {
         if (empty($root) || false === ctype_alpha($root)) {
-            App::triggerError(E_NOTICE, 'First argument in Response::xml requires a string');
+            Exception::raise('First argument in Response::xml requires a string', 2);
             return false;
         }
 
         if (false === is_array($data)) {
-            App::triggerError(E_NOTICE, 'Second argument in Response::xml requires a array');
+            Exception::raise('Second argument in Response::xml requires a array', 2);
             return false;
         }
 

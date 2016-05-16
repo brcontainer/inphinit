@@ -11,6 +11,8 @@ namespace Experimental;
 
 use Inphinit\App;
 use Inphinit\View;
+use Inphinit\Request;
+use Inphinit\Response;
 
 class Debug
 {
@@ -85,13 +87,22 @@ class Debug
             $line  = $match[2];
         }
 
-        View::render(self::$views['error'], array(
+        $data =  array(
             'message' => $message,
             'type'    => $type,
             'file'    => $oFile,
             'line'    => $line,
             'source'  => $line > -1 ? self::source($file, $line) : null
-        ));
+        );
+
+        if (Request::is('xhr') && headers_sent() === false) {
+            header('Content-Type: application/json', false, 500);
+            echo json_encode($data);
+            self::unregister();
+            exit;
+        } else {
+            View::render(self::$views['error'], $data);
+        }
     }
 
     public static function performance()

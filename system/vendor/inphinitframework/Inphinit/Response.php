@@ -17,6 +17,7 @@ class Response
     private $delay;
     private $clean = true;
 
+    private static $httpCode;
     private static $headers = array();
     private static $dispatchedHeaders = false;
 
@@ -37,16 +38,15 @@ class Response
         $headers = self::$headers;
 
         if (empty($headers) === false) {
+            $lastCode = null;
+
+            self::$dispatchedHeaders = true;
+
             foreach ($headers as $value) {
-                if (is_numeric($value[2])) {
-                    header($value[0], $value[1], $value[2]);
-                } else {
-                    header($value[0], $value[1]);
-                }
+                self::putHeader($value[0], $value[1], is_numeric($value[2]) ? $value[2] : null);
             }
 
             $headers = null;
-            self::$dispatchedHeaders = true;
         }
     }
 
@@ -55,24 +55,39 @@ class Response
         return self::$headers;
     }
 
-    public static function status($code = null)
+    public static function status($code = null, $preventTrigger = false)
     {
-        return \UtilsStatusCode($code);
+        if (self::$httpCode !== $code && is_int($code) && headers_sent() === false) {
+            header('X-PHP-Response-Code: ' . $code, true, $code);
+            self::$httpCode = $code;
+
+            if (!$preventTrigger) {
+                App::on('changestatus', array($code, null));
+            }
+
+            return true;
+        } elseif (self::$httpCode === null) {
+            self::$httpCode = \UtilsStatusCode();
+        }
+
+        return self::$httpCode;
     }
 
-    public static function putHeader($header, $replace = true, $status = null)
+    public static function putHeader($header, $replace = true, $code = null)
     {
         if (self::$dispatchedHeaders) {
-            if (is_numeric($status)) {
-                header($header, $replace, $status);
+            if (is_numeric($code)) {
+                header($header, $replace, $code);
+                self::$httpCode = $code;
+                App::on('changestatus', array($code, null));
             } else {
                 header($header, $replace);
             }
             return null;
         }
 
-        if (is_string($header) && is_bool($replace) && ($status === null || is_numeric($status))) {
-            self::$headers[] = array($header, $replace, $status);
+        if (is_string($header) && is_bool($replace) && ($code === null || is_numeric($code))) {
+            self::$headers[] = array($header, $replace, $code);
             return count(self::$headers);
         }
 

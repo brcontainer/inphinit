@@ -17,7 +17,7 @@ class Helper
     public static function extractVersion($version)
     {
         if (preg_match('#^(\d+)\.(\d+)\.(\d+)(\-([\w.\-]+)|)$#', $version, $match) > 0) {
-            return array(
+            return (object) array(
                 'major' => $match[1],
                 'minor' => $match[2],
                 'patch' => $match[3],
@@ -62,8 +62,7 @@ class Helper
         $paths = explode('.', $path);
 
         foreach ($paths as $value) {
-            $items = is_array($items) && array_key_exists($value, $items) ?
-                $items[$value] : false;
+            $items = is_array($items) && array_key_exists($value, $items) ? $items[$value] : false;
 
             if ($items === false) {
                 break;

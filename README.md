@@ -2,14 +2,6 @@
 
 PHP framework, routes, controllers and views
 
-#Requirements
-
-1. PHP 5.3.0+
-1. Multibyte String (GD also) (optional, only used in `Inphinit\Helper::makeUrl`)
-1. libiconv (optional, only used in `Inphinit\Helper::makeUrl`)
-1. fileinfo (optional, only used in `Inphinit\File::mimeType`)
-1. Apache or Nginx or IIS for production
-
 #Perfomance
 
 The reason I created this framework was to try to achieve a good performance and have the basic features of a framework with routes.
@@ -104,7 +96,7 @@ The reason I created this framework was to try to achieve a good performance and
 
     ```
     cd /home/[project_name]/
-    php -S localhost:9000 server.php
+    php -S localhost:9000 system/server.php
     ```
 
 1. Open web-browser and navigate to `http://localhost:9000`
@@ -119,6 +111,16 @@ The reason I created this framework was to try to achieve a good performance and
     ```
 
 1. Save edition and run server.sh
+
+#Requirements
+
+1. PHP 5.3.0+
+1. Multibyte String (GD also) (optional, only used in `Inphinit\Helper::makeUrl`)
+1. libiconv (optional, only used in `Inphinit\Helper::makeUrl`)
+1. fileinfo (optional, only used in `Inphinit\File::mimeType`)
+1. Apache or Nginx or IIS for production
+
+For check requeriments navigate with your web-browser to `http://localhost:9000/check.php` or `http://localhost/[project_name]/check.php`
 
 #Routing
 
@@ -167,10 +169,6 @@ return array(
     'maintenance'     => false
 );
 ```
-
-#Checking webserver requirements
-
-For check requeriments navigate with your web-browser to `http://localhost:9000/check.php` or `http://localhost/[project_name]/check.php`
 
 #Nginx
 

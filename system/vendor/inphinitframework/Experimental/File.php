@@ -46,8 +46,7 @@ class File
     public static function isBinary($path)
     {
         if (false === is_readable($path)) {
-            App::triggerError(E_NOTICE, $path . ' is not readable');
-            return false;
+            Exception::raise($path . ' is not readable', 2);
         }
 
         $size = filesize($path);

@@ -9,20 +9,13 @@
 
 namespace Experimental;
 
-class Exception extends \Exception
+class Exception extends \ErrorException
 {
-    public function setup($file, $line)
-    {
-        $this->line = $line;
-        $this->file = $file;
-    }
-
     public static function raise($message, $level = 1, $type = E_USER_ERROR)
     {
-        $data = Debug::caller($level);
-        $e = new Exception($message, $type);
-        $e->setup($data['file'], $data['line']);
+        $caller = get_called_class();
+        $data   = Debug::caller($level);
 
-        throw $e;
+        throw new $caller($message, $type, 0, $type, $data['file'], $data['line']);
     }
 }

@@ -17,7 +17,7 @@ class App
     private static $events = array();
     private static $configs = array();
     private static $initiate = false;
-    private static $preventDuplicateError = '';
+    private static $detectError = false;
 
     public static function env($key, $value = null)
     {
@@ -41,11 +41,6 @@ class App
         $data = null;
     }
 
-    public static function hasError()
-    {
-        return self::$preventDuplicateError !== '';
-    }
-
     public static function trigger($event, array $args = array())
     {
         if (empty(self::$events[$event])) {
@@ -54,11 +49,20 @@ class App
 
         $listen = self::$events[$event];
 
+        if ($event === 'error') {
+            self::$detectError = true;
+        }
+
         foreach ($listen as $value) {
             call_user_func_array($value[0], empty($args) ? $value[1] : $args);
         }
 
         $listen = null;
+    }
+
+    public static function hasError()
+    {
+        return self::$detectError;
     }
 
     public static function on($name, $callback, array $defaultArgs = array())
@@ -109,8 +113,18 @@ class App
     {
         self::config('config');
 
-        error_reporting(E_ALL|E_STRICT);
-        ini_set('display_errors', self::env('developer') === true ? '1' : '0');
+        $dev = self::env('developer') === true;
+
+        error_reporting($dev ? E_ALL|E_STRICT : E_ALL & ~E_STRICT & ~E_DEPRECATED);
+        ini_set('display_errors', $dev ? 1 : 0);
+    }
+
+    public static function stop($code, $msg = null)
+    {
+        Response::status($code, true);
+        self::trigger('changestatus', array($code, $msg));
+        self::trigger('finish');
+        exit;
     }
 
     public static function exec()
@@ -124,21 +138,31 @@ class App
         self::$initiate = true;
 
         if (self::env('maintenance') === true) {
-            Response::status(503);
-            self::trigger('maintenance');
-        } else {
-            $mainController = Route::get();
+            self::stop(503);
+        }
 
-            if ($mainController) {
-                $parsed = explode(':', $mainController, 2);
+        self::trigger('changestatus', array(\UtilsStatusCode(), null));
 
-                $mainController = '\\Controller\\' . strtr($parsed[0], '.', '\\');
-                $action = $parsed[1];
+        $route = Route::get();
 
-                $run = new $mainController;
+        if ($route) {
+            $mainController = $route['controller'];
+            $parsed = explode(':', $mainController, 2);
+
+            $mainController = '\\Controller\\' . strtr($parsed[0], '.', '\\');
+            $action = $parsed[1];
+
+            $run = new $mainController;
+
+            if (empty($route['args'])) {
                 $run->$action();
-                $run = null;
+            } else {
+                call_user_func_array(array($run, $action), $route['args']);
             }
+
+            $run = null;
+        } else {
+            App::stop(404, 'Invalid route');
         }
 
         if (class_exists('\\Inphinit\\Response', false)) {
@@ -150,10 +174,6 @@ class App
         }
 
         self::trigger('ready');
-
-        $caller = null;
-
-        self::trigger('beforefinish');
         self::trigger('finish');
     }
 }

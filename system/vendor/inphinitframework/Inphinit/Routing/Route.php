@@ -11,36 +11,8 @@ namespace Inphinit\Routing;
 
 class Route extends Router
 {
-    private static $statusRoutes = array();
     private static $httpRoutes = array();
-    private static $noRoutes;
-    private static $matched;
-    private static $cController;
-    private static $cVerb;
-
-    public static function invalid($action)
-    {
-        if ($action !== null || is_string($action)) {
-            self::$noRoutes = $action;
-        }
-    }
-
-    public static function status($code, $action)
-    {
-        if (is_array($code)) {
-            if (is_array($code)) {
-                $method = array_filter($code, 'is_numeric');
-
-                foreach ($code as $value) {
-                    self::status($value, $action);
-                }
-            }
-        } elseif (is_numeric($code) && (
-            $action !== null || is_string($action)
-        )) {
-            self::$statusRoutes[$code] = $action;
-        }
-    }
+    private static $current;
 
     public static function set($method, $path, $action)
     {
@@ -52,29 +24,22 @@ class Route extends Router
                     self::set($value, $path, $action);
                 }
             }
-        } elseif (ctype_alpha($method) && is_string($path) && (
-            $action !== null || is_string($action)
-        )) {
+        } elseif (ctype_alpha($method) && is_string($path) && ($action !== null || is_string($action))) {
             $verb = strtoupper(trim($method)) . ' ' . parent::$prefixPath . $path;
             self::$httpRoutes[$verb] = parent::$prefixNS . $action;
         }
     }
 
-    public static function matches()
+    private static function find($httpMethod, $route, $pathinfo, &$matches)
     {
-        return self::$matched;
-    }
-
-    private static function find($httpMethod, $findRoute, $pathinfo)
-    {
-        $match = explode(' re:', $findRoute, 2);
+        $match = explode(' re:', $route, 2);
 
         if ($match[0] !== 'ANY' && $match[0] !== $httpMethod) {
             return false;
         }
 
-        if (preg_match($match[1], $pathinfo, $match) > 0) {
-            self::$matched = $match;
+        if (preg_match($match[1], $pathinfo, $matches) > 0) {
+            array_shift($matches);
             return true;
         }
 
@@ -83,59 +48,47 @@ class Route extends Router
 
     public static function get()
     {
-        if (self::$cController !== null) {
-            return self::$cController;
+        if (self::$current !== null) {
+            return self::$current;
         }
 
         $func = false;
         $verb = false;
 
-        $routes = array_filter(self::$statusRoutes);
+        $args = null;
 
-        if (empty($routes) === false) {
-            $status = \UtilsStatusCode();
+        $routes = array_filter(self::$httpRoutes);
+        $pathinfo = \UtilsPath();
+        $httpMethod = $_SERVER['REQUEST_METHOD'];
 
-            if (isset($routes[$status])) {
-                $func = $routes[$status];
-            }
-        }
+        $verb = 'ANY ' . $pathinfo;
+        $http = $httpMethod . ' ' . $pathinfo;
 
-        if ($func === false) {
-            $routes = array_filter(self::$httpRoutes);
-            $pathinfo = \UtilsPath();
-            $httpMethod = $_SERVER['REQUEST_METHOD'];
-
-            $verb = 'ANY ' . $pathinfo;
-            $http = $httpMethod . ' ' . $pathinfo;
-
-            if (isset($routes[$verb])) {
-                $func = $routes[$verb];
-            } elseif (isset($routes[$http])) {
-                $func = $routes[$http];
-                $verb = $http;
-            } elseif (empty($routes) === false) {
-                foreach ($routes as $key => $value) {
-                    if (strpos($key, ' re:') !== false && self::find($httpMethod, $key, $pathinfo)) {
-                        $func = $value;
-                        $verb = $key;
-                    }
+        if (isset($routes[$verb])) {
+            $func = $routes[$verb];
+        } elseif (isset($routes[$http])) {
+            $func = $routes[$http];
+            $verb = $http;
+        } elseif (empty($routes) === false) {
+            foreach ($routes as $key => $value) {
+                if (strpos($key, ' re:') !== false && self::find($httpMethod, $key, $pathinfo, $args)) {
+                    $func = $value;
+                    $verb = $key;
+                    break;
                 }
             }
         }
 
-        if ($func === false && self::$noRoutes !== null) {
-            $func = self::$noRoutes;
-        }
-
         if ($func !== false) {
-            self::$cController = $func;
-            self::$cVerb = $verb;
+            self::$current = array(
+                'controller' => $func, 'args' => $args
+            );
         } else {
-            self::$cController = false;
+            self::$current = false;
         }
 
-        $routes = self::$statusRoutes = self::$httpRoutes = null;
+        $routes = self::$httpRoutes = null;
 
-        return self::$cController;
+        return self::$current;
     }
 }

@@ -12,7 +12,6 @@ namespace Inphinit;
 class Cache
 {
     private $expires;
-    private $hash;
     private $handle;
     private $cacheName;
     private $cacheTmp;
@@ -45,16 +44,15 @@ class Cache
             $data = file_get_contents($lastModify);
 
             if ($data !== false && $data > REQUEST_TIME) {
-                $this->lastModified = $data;
                 $this->isCache      = true;
-                $this->hash         = sha1_file($filename);
 
-                $this->sendHeaders();
+                header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $data) . ' GMT');
+                header('Etag: ' . sha1_file($filename));
 
                 if (self::match($data)) {
-                    \UtilsStatusCode(304);
+                    Response::status(304);
                 } else {
-                    App::on('beforefinish', array($this, 'show'));
+                    App::on('ready', array($this, 'show'));
                 }
 
                 return null;
@@ -71,7 +69,7 @@ class Cache
 
         $this->handle = $tmp;
 
-        App::on('beforefinish', array($this, 'finish'));
+        App::on('ready', array($this, 'finish'));
 
         App::buffer(array($this, 'write'), 1024);
     }
@@ -121,12 +119,6 @@ class Cache
     public function cached()
     {
         return $this->isCache;
-    }
-
-    private function sendHeaders()
-    {
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $this->lastModified) . ' GMT');
-        header('Etag: ' . $this->hash);
     }
 
     public function write($data)

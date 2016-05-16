@@ -17,6 +17,7 @@
         text-align: center;
     }
     .container .header {
+        display: inline;
         display: inline-block;
         vertical-align: middle;
         width: 98%;
@@ -30,7 +31,7 @@
     .container:before {
         display: inline-block;
         vertical-align: middle;
-        content: '';
+        content: "";
         height: 100%;
         width: 0;
     }

@@ -5,9 +5,10 @@ use Inphinit\View;
 
 class Profile
 {
-    public function view()
+    public function view($username)
     {
-        $data = array( 'text' => 'test' );
-        View::render('home', $data);
+        View::render('foo.bar', array(
+            'name' => $username
+        ));
     }
 }

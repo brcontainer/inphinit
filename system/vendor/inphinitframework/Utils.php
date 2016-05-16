@@ -36,28 +36,23 @@ function UtilsShutDown()
     App::trigger('terminate');
 }
 
-function UtilsStatusCode($code = null)
+function UtilsStatusCode()
 {
-    static $currentStatus;
+    static $initial;
 
-    if ($code === null) {
-        if ($currentStatus !== null) {
-            return $currentStatus;
-        }
-
-        $currentStatus = 200;
-
-        if (empty($_SERVER['PHP_SELF']) === false &&
-            preg_match('#/RESERVED\.INPHINIT\-(\d{3})\.html$#', $_SERVER['PHP_SELF'], $match) > 0)
-        {
-            $currentStatus = (int) $match[1];
-        }
-    } elseif (is_int($code) && headers_sent() === false) {
-        header('X-PHP-Response-Code: ' . $code, true, $code);
-        $currentStatus = $code;
+    if ($initial !== null) {
+        return $initial;
     }
 
-    return $currentStatus;
+    $initial = 200;
+
+    if (empty($_SERVER['PHP_SELF']) === false &&
+        preg_match('#/RESERVED\.INPHINIT\-(\d{3})\.html$#', $_SERVER['PHP_SELF'], $match) > 0)
+    {
+        $initial = (int) $match[1];
+    }
+
+    return $initial;
 }
 
 function UtilsPath()
@@ -72,8 +67,12 @@ function UtilsPath()
     $reqUri = empty($_SERVER['REQUEST_URI']) ? null :
                 preg_replace('#\?(.*)$#', '', $_SERVER['REQUEST_URI']);
 
-    $pathInfo = substr(urldecode($reqUri), strlen(rtrim(dirname($sname), '/')) + 1);
+    $pathInfo = rtrim(strtr(dirname($sname), '\\', '/'), '/');
+
+    $pathInfo = substr(urldecode($reqUri), strlen($pathInfo) + 1);
+
     $pathInfo = '/' . ($pathInfo === false ? '' : $pathInfo);
+
     return $pathInfo;
 }
 
@@ -103,21 +102,18 @@ function UtilsAutoload()
             return NULL;
         }
 
-        $delimiter = false;
         $isfile = false;
         $base = false;
 
         if (empty($prefixes) === false) {
-            if (isset($prefixes[$classname]) &&
-                preg_match('#\.[a-z0-9]+$#', $prefixes[$classname]) !== 0)
-            {
+            if (isset($prefixes[$classname]) && preg_match('#\.[a-z0-9]+$#', $prefixes[$classname]) !== 0) {
                 $isfile = true;
                 $base = $prefixes[$classname];
             } else {
-                foreach ($prefixes as $key => $value) {
-                    if (stripos($classname, $key) === 0) {
-                        $delimiter = substr($key, -1);
-                        $base = trim($value, '/') . '/';
+                foreach ($prefixes as $prefix => $path) {
+                    if (stripos($classname, $prefix) === 0) {
+                        $classname = substr($classname, strlen($prefix));
+                        $base = trim($path, '/') . '/' . str_replace(substr($prefix, -1), '/', $classname);
                         break;
                     }
                 }
@@ -130,13 +126,7 @@ function UtilsAutoload()
 
         $path = INPHINIT_PATH;
 
-        if ($delimiter !== false) {
-            $classname = substr($classname, strpos($classname, $delimiter) + 1);
-            $base .= str_replace($delimiter, '/', $classname);
-        }
-
-        $files = $isfile ? array( $path . $base ) :
-                    array( $path . $base . '.php', $path . $base . '.hh' );
+        $files = $isfile ? array( $path . $base ) : array( $path . $base . '.php', $path . $base . '.hh' );
 
         $files = array_filter($files, 'is_file');
 
@@ -156,11 +146,9 @@ function UtilsError($type, $message, $file, $line, $details)
 
     $str  = '?' . $file . ':' . $line . '?';
 
-    if (is_string($message)) {
-        if ($preventDuplicate === null && strpos($preventDuplicate, $str) === false) {
-            $preventDuplicate .= $str;
-            App::trigger('error', array($type, $message, $file, $line, $details));
-        }
+    if ($preventDuplicate === null && strpos($preventDuplicate, $str) === false) {
+        $preventDuplicate .= $str;
+        App::trigger('error', array($type, $message, $file, $line, $details));
     }
 
     return false;
