@@ -13,9 +13,6 @@ define('INPHINIT_PATH', ROOT_PATH . 'system/');
 define('INPHINIT_COMPOSER', false);
 
 require_once INPHINIT_PATH . 'boot/autoload.php';
-
-Inphinit\App::prepare();
-
 require_once INPHINIT_PATH . 'main.php';
 
 Inphinit\App::exec();

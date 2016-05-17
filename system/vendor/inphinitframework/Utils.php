@@ -154,5 +154,15 @@ function UtilsError($type, $message, $file, $line, $details)
     return false;
 }
 
+function UtilsConfig()
+{
+    App::config('config');
+
+    $dev = App::env('developer') === true;
+
+    error_reporting($dev ? E_ALL|E_STRICT : E_ALL & ~E_STRICT & ~E_DEPRECATED);
+    ini_set('display_errors', $dev ? 1 : 0);
+}
+
 register_shutdown_function('UtilsShutDown');
 set_error_handler('UtilsError', E_ALL|E_STRICT);

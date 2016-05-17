@@ -13,7 +13,6 @@ use Inphinit\Routing\Route;
 
 class App
 {
-    private static $cpath;
     private static $events = array();
     private static $configs = array();
     private static $initiate = false;
@@ -107,16 +106,6 @@ class App
         }
 
         ob_start($callback, $chunksize, $flags);
-    }
-
-    public static function prepare()
-    {
-        self::config('config');
-
-        $dev = self::env('developer') === true;
-
-        error_reporting($dev ? E_ALL|E_STRICT : E_ALL & ~E_STRICT & ~E_DEPRECATED);
-        ini_set('display_errors', $dev ? 1 : 0);
     }
 
     public static function stop($code, $msg = null)

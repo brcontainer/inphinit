@@ -17,3 +17,5 @@ if (INPHINIT_COMPOSER) {
 } else {
     UtilsAutoload();
 }
+
+UtilsConfig();
