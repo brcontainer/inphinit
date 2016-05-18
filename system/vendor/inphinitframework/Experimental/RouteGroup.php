@@ -14,44 +14,40 @@ use Inphinit\Routing\Router;
 
 class RouteGroup extends Router
 {
-    protected static $prefixPath;
+    private $initiate = true;
 
-    private static function checkDomain($domain)
+    public function domain($domain = null)
     {
-        $host = $_SERVER['HTTP_HOST'];
-
-        if ($host === $domain) {
-            return true;
-        }
-
-        return false;
+        App::on('init', array($this, 'run'));
     }
 
-    public static function by(array $opts, \Closure $call)
+    public function domain($domain = null)
     {
-        if (empty($opts['path']) && empty($opts['domain'])) {
-            Exception::raise('path and domain not defined', 2);
-            return null;
+        if (empty($domain)) {
+            Exception::raise('domain is not defined', 2);
         }
 
-        if (empty($opts['domain']) === false && self::checkDomain($opts['domain'])) {
-            Exception::raise('path and domain not defined', 2);
-            return null;
+        return $this;
+    }
+
+    public function path($path)
+    {
+        if (empty($path)) {
+            Exception::raise('path is not defined', 2);
         }
 
-        $path = rtrim($opts['path'], '/') . '/';
+        return $this;
+    }
 
-        if (strpos(\UtilsPath(), $path) === 0) {
-            parent::$prefixPath = rtrim($opts['path'], '/');
+    public static function call(\Closure $call)
+    {
+        return $this;
+    }
 
-            if (empty($opts['namespace']) === false) {
-                parent::$prefixNS = $opts['namespace'];
-            }
-
-            $call();
-
-            parent::$prefixNS = '';
-            parent::$prefixPath = '';
+    public static function run()
+    {
+        if ($this->initiate) {
+            return false;
         }
     }
 }

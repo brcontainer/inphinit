@@ -146,7 +146,11 @@ function UtilsError($type, $message, $file, $line, $details)
 
     $str  = '?' . $file . ':' . $line . '?';
 
-    if ($preventDuplicate === null && strpos($preventDuplicate, $str) === false) {
+    if ($preventDuplicate === null) {
+        $preventDuplicate = '';
+    }
+
+    if (strpos($preventDuplicate, $str) === false) {
         $preventDuplicate .= $str;
         App::trigger('error', array($type, $message, $file, $line, $details));
     }

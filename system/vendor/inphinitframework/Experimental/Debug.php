@@ -96,13 +96,17 @@ class Debug
         );
 
         if (Request::is('xhr') && headers_sent() === false) {
-            header('Content-Type: application/json', false, 500);
+            ob_start();
+
             echo json_encode($data);
             self::unregister();
-            exit;
-        } else {
-            View::render(self::$views['error'], $data);
+
+            Response::cache(0);
+            Response::type('application/json');
+            App::abort(500);
         }
+
+        View::render(self::$views['error'], $data);
     }
 
     public static function performance()

@@ -24,7 +24,7 @@ class Shell
 
     public function __construct()
     {
-        if (self::cli()) {
+        if (self::isCli()) {
             global $argc, $argv;
 
             $this->argc = is_int($argc) ? ($argc - 1) : 0;
@@ -51,21 +51,21 @@ class Shell
         return $this->argc !== 0;
     }
 
-    public static function cli()
+    public static function isCli()
     {
         return php_sapi_name() === 'cli';
     }
 
     public static function input($length = 1024)
     {
-        if (self::cli()) {
+        if (self::isCli()) {
             return fgets(STDIN, $length);
         }
     }
 
     public function inputObserver($callback, $exitCicle = 'exit')
     {
-        if (self::cli() === false || is_callable($callback) === false) {
+        if (self::isCli() === false || is_callable($callback) === false) {
             return false;
         }
 

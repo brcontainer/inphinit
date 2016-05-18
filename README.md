@@ -17,7 +17,7 @@ The reason I created this framework was to try to achieve a good performance and
 
 ##Memory peak comparison
 
-- Inphinit: 389.4921875
+- Inphinit: 374.4921875
 - Silex: 2426.9140625
 - Lumen: 2595.03125
 - laravel5.2: 7869.96875

@@ -1,13 +1,8 @@
 <?php
 use Inphinit\App;
 use Inphinit\View;
+use Inphinit\Request;
 use Inphinit\Routing\Route;
-
-use Experimental\Debug;
-
-if (App::env('developer') === true) {
-    Debug::capture('error', 'debug.error');
-}
 
 App::on('changestatus', function ($status, $msg) {
     if ($status === 503) {
@@ -17,7 +12,7 @@ App::on('changestatus', function ($status, $msg) {
         View::render('httpview', array(
             'title'  => $msg ? $msg : 'Página inacessível',
             'method' => $_SERVER['REQUEST_METHOD'],
-            'path'   => Inphinit\Request::path(),
+            'path'   => Request::path(),
             'status' => $status
         ));
         exit;
