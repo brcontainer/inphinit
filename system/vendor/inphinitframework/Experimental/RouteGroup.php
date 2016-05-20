@@ -16,6 +16,12 @@ class RouteGroup extends Router
 {
     private $initiate = true;
 
+    public static function instance()
+    {
+        $class = get_called_class();
+        return new $class;
+    }
+
     public function domain($domain = null)
     {
         App::on('init', array($this, 'run'));
@@ -49,5 +55,7 @@ class RouteGroup extends Router
         if ($this->initiate) {
             return false;
         }
+
+        $this->initiate = true;
     }
 }

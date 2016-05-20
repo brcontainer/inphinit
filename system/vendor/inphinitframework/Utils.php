@@ -26,6 +26,10 @@ function UtilsSandboxLoader($utilsSandBoxPath, array $utilsSandBoxData = array()
 
 function UtilsShutDown()
 {
+    if (class_exists('\\Inphinit\\View', false)) {
+        Inphinit\View::forceRender();
+    }
+
     $e = error_get_last();
 
     if ($e !== null) {
@@ -140,10 +144,6 @@ function UtilsError($type, $message, $file, $line, $details)
 {
     static $preventDuplicate;
 
-    if (class_exists('\\Inphinit\\View', false) && (E_ERROR === $type || E_PARSE === $type)) {
-        Inphinit\View::forceRender();
-    }
-
     $str  = '?' . $file . ':' . $line . '?';
 
     if ($preventDuplicate === null) {
@@ -166,7 +166,8 @@ function UtilsConfig()
 
     error_reporting($dev ? E_ALL|E_STRICT : E_ALL & ~E_STRICT & ~E_DEPRECATED);
     ini_set('display_errors', $dev ? 1 : 0);
+
+    register_shutdown_function('UtilsShutDown');
+    set_error_handler('UtilsError', E_ALL|E_STRICT);
 }
 
-register_shutdown_function('UtilsShutDown');
-set_error_handler('UtilsError', E_ALL|E_STRICT);

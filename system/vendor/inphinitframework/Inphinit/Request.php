@@ -13,9 +13,17 @@ class Request
 {
     private static $reqHeaders = array();
 
-    public static function path()
+    public static function path($info = false)
     {
-        return \UtilsPath();
+        if ($info === true) {
+            return \UtilsPath();
+        }
+
+        if (isset($_SERVER['REQUEST_URI'])) {
+            return preg_replace('#\?(.*)$#', '', $_SERVER['REQUEST_URI']);
+        }
+
+        return false;
     }
 
     public static function is($check)

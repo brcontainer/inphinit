@@ -31,16 +31,12 @@ class Debug
         self::$displayErrors = ini_get('display_errors');
 
         ini_set('display_errors', '0');
-
-        App::on('error',     array( '\\Experimental\\Debug', 'error' ));
-        App::on('terminate', array( '\\Experimental\\Debug', 'performance' ));
-        App::on('terminate', array( '\\Experimental\\Debug', 'classes' ));
     }
 
     public static function unregister()
     {
         if (self::$initiate === false) {
-            return false;
+            return null;
         }
 
         App::off('error',     array( '\\Experimental\\Debug', 'error' ));
@@ -52,32 +48,90 @@ class Debug
         self::$initiate = false;
     }
 
-    public static function capture($type, $view)
-    {
-        if ($view !== null && View::exists($view) === false) {
-            return false;
-        }
-
-        switch ($type) {
-            case 'error':
-            case 'classes':
-            case 'performance':
-                self::$views[$type] = $view;
-            break;
-            default:
-                return false;
-        }
-
-        self::register();
-        return true;
-    }
-
-    public static function error($type, $message, $file, $line)
+    public static function renderError($type, $message, $file, $line)
     {
         if (empty(self::$views['error'])) {
             return null;
         }
 
+        $data = self::details($message, $file, $file);
+
+        $nhs = !headers_sent();
+
+        if ($nhs && Request::is('xhr')) {
+            ob_start();
+
+            self::unregister();
+
+            Response::cache(0);
+            Response::type('application/json');
+
+            echo json_encode($data);
+
+            App::abort(500);
+        }
+
+        View::render(self::$views['error'], $data);
+    }
+
+    public static function renderPerformance()
+    {
+        if (empty(self::$views['performance'])) {
+            return null;
+        }
+
+        View::render(self::$views['performance'], self::performance());
+    }
+
+    public static function renderClasses()
+    {
+        if (empty(self::$views['classes'])) {
+            return null;
+        }
+
+        View::render(self::$views['classes'], array(
+                'classes' => self::classes()
+            ));
+    }
+
+    public static function view($type, $view)
+    {
+        if ($view !== null && View::exists($view) === false) {
+            Exception::raise($view . ' view is not found', 2);
+        }
+
+        $data = array( '\\Experimental\\Debug', 'render' . ucfirst($type) );
+
+        switch ($type) {
+            case 'error':
+                self::$views[$type] = $view;
+
+                if ($data) {
+                    App::on('error', $data);
+                } else {
+                    App::off('error', $data);
+                }
+            break;
+
+            case 'classes':
+            case 'performance':
+                self::$views[$type] = $view;
+
+                if ($data) {
+                    App::on('terminate', $data);
+                } else {
+                    App::off('terminate', $data);
+                }
+            break;
+            default:
+                Exception::raise($type . ' is not valid event', 2);
+        }
+
+        self::register();
+    }
+
+    public static function details($message, $file, $line)
+    {
         $match = array();
         $oFile = $file;
 
@@ -87,48 +141,26 @@ class Debug
             $line  = $match[2];
         }
 
-        $data =  array(
+        return array(
             'message' => $message,
-            'type'    => $type,
             'file'    => $oFile,
             'line'    => $line,
             'source'  => $line > -1 ? self::source($file, $line) : null
         );
-
-        if (Request::is('xhr') && headers_sent() === false) {
-            ob_start();
-
-            echo json_encode($data);
-            self::unregister();
-
-            Response::cache(0);
-            Response::type('application/json');
-            App::abort(500);
-        }
-
-        View::render(self::$views['error'], $data);
     }
 
     public static function performance()
     {
-        if (empty(self::$views['performance'])) {
-            return null;
-        }
-
-        View::render(self::$views['performance'], array(
+        return array(
             'usage' => memory_get_usage() / 1024,
             'peak'  => memory_get_peak_usage() / 1024,
             'real'  => memory_get_peak_usage(true) / 1024,
-            'time'  => microtime() - INIT_APP
-        ));
+            'time'  => microtime(true) - INIT_APP
+        );
     }
 
     public static function classes()
     {
-        if (empty(self::$views['classes'])) {
-            return null;
-        }
-
         $objs = array();
         $listClasses = get_declared_classes();
 
@@ -145,10 +177,7 @@ class Debug
 
         $listClasses = null;
 
-        $objs = array( 'classes' => $objs );
-
-        View::render(self::$views['classes'], $objs);
-        $objs = null;
+        return $objs;
     }
 
     public static function source($source, $line)

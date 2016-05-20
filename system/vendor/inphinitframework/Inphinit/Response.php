@@ -23,7 +23,7 @@ class Response
 
     public function __construct()
     {
-        App::on('beforefinish', array($this, 'show'));
+        App::on('ready', array($this, 'show'));
     }
 
     public function cleanAfterUse($active = true)
@@ -62,7 +62,7 @@ class Response
             self::$httpCode = $code;
 
             if (!$preventTrigger) {
-                App::on('changestatus', array($code, null));
+                App::trigger('changestatus', array($code, null));
             }
 
             return true;
@@ -96,7 +96,7 @@ class Response
 
     public static function removeHeader($index)
     {
-        if (isset(self::$headers[$index])) {
+        if (self::$dispatchedHeaders && isset(self::$headers[$index])) {
             self::$headers[$index] = null;
             return true;
         }
