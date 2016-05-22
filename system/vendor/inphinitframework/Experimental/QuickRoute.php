@@ -9,13 +9,12 @@
 
 namespace Experimental;
 
-use App;
-use Route;
+use Inphinit\App;
+use Inphinit\Routing\Router;
 
-class QuickRoute
+class QuickRoute extends Router
 {
-    private $prefix = '';
-    private $methods;
+    private $classMethods = array();
     private $controller;
     private $format;
     private $ready = false;
@@ -24,26 +23,55 @@ class QuickRoute
     const SLASH = 2;
     const NOSLASH = 3;
 
-    public static function quick($namecontroller, $prefixroute = null, $slash = null)
+    public static function instance($namecontroller)
     {
-        $run = new QuickRoute($namecontroller, $prefixroute, $slash);
-        $run->prepare();
-        $run = null;
+        return new self($namecontroller);
     }
 
-    public function __construct($namecontroller, $prefixroute = null, $slash = null)
+    public function __construct($namecontroller)
     {
-        $controller = '\\Controller\\' . strtr($namecontroller, '.', '\\');
-        $run = new $controller;
+        $this->format = QuickRoute::BOTH;
 
-        $this->format = $slash > 0 && $slash < 3 ? $slash : QuickRoute::BOTH;
-        $this->methods = get_class_methods($controller);
+        $controller = self::$prefixNS . strtr($namecontroller, '.', '\\');
+        $fc = '\\Controller\\' . $controller;
 
-        if (is_string($prefixroute)) {
-            $this->prefix = rtrim($prefixroute, '/');
+        if (class_exists($fc) === false) {
+            Exception::raise('Invalid class ' . $fc);
         }
 
+        $this->classMethods = get_class_methods($fc);
+        $this->controller   = $controller;
+
         App::on('init', array($this, 'prepare'));
+
+        return $this;
+    }
+
+    public function allow(array $classMethods)
+    {
+        $this->classMethods = array_diff($this->classMethods, $classMethods);
+
+        return $this;
+    }
+
+    public function disallow(array $classMethods)
+    {
+        $this->classMethods = array_diff($this->classMethods, $classMethods);
+
+        return $this;
+    }
+
+    public function canonical($slash = null)
+    {
+        switch ($slash) {
+            case self::BOTH:
+            case self::SLASH:
+            case self::NOSLASH:
+                $this->format = $slash;
+            break;
+        }
+
+        return $this;
     }
 
     public function prepare()
@@ -54,31 +82,20 @@ class QuickRoute
 
         $this->ready = true;
 
-        $format     = $this->format;
-        $prefix     = $this->prefix;
-        $methods    = $this->methods;
-        $controller = $this->controller;
+        $format       = $this->format;
+        $controller   = $this->controller;
+        $classMethods = $this->classMethods;
 
-        foreach ($methods as $value) {
+        foreach ($classMethods as $value) {
             if ($format === self::BOTH || $format === self::SLASH) {
-                Route::create('ANY', $prefix . '/' . $value . '/', $controller . ':' . $value);
+                Route::set('ANY', '/' . $value . '/', $controller . ':' . $value);
             }
 
             if ($format === self::BOTH || $format === self::NOSLASH) {
-                Route::create('ANY', $prefix . '/' . $value, $controller . ':' . $value);
+                Route::set('ANY', '/' . $value, $controller . ':' . $value);
             }
         }
 
-        $controller = $methods = null;
-    }
-
-    public function allow(array $methods)
-    {
-        $this->methods = array_diff($this->methods, $methods);
-    }
-
-    public function disallow(array $methods)
-    {
-        $this->methods = array_diff($this->methods, $methods);
+        $controller = $classMethods = null;
     }
 }

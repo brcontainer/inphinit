@@ -14,7 +14,7 @@ use Inphinit\Routing\Router;
 
 class RouteGroup extends Router
 {
-    private $initiate = true;
+    private $ready = true;
 
     public static function instance()
     {
@@ -22,9 +22,9 @@ class RouteGroup extends Router
         return new $class;
     }
 
-    public function domain($domain = null)
+    public function __construct()
     {
-        App::on('init', array($this, 'run'));
+        App::on('init', array($this, 'prepare'));
     }
 
     public function domain($domain = null)
@@ -50,12 +50,12 @@ class RouteGroup extends Router
         return $this;
     }
 
-    public static function run()
+    public static function prepare()
     {
-        if ($this->initiate) {
+        if ($this->ready) {
             return false;
         }
 
-        $this->initiate = true;
+        $this->ready = true;
     }
 }

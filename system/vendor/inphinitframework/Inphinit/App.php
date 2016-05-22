@@ -75,8 +75,6 @@ class App
         }
 
         self::$events[$name][] = array($callback, $defaultArgs);
-
-        return true;
     }
 
     public static function off($name, $callback = null)
@@ -85,18 +83,19 @@ class App
             return false;
         } elseif ($callback === null) {
             self::$events[$name] = array();
-            return true;
+            return null;
         }
 
-        $index = array_search($callback, self::$events);
+        $evts = self::$events[$name];
 
-        if ($index !== false) {
-            self::$events[$event][$index] = null;
-            unset(self::$events[$event][$index]);
-            return true;
+        foreach ($evts as $key => $value) {
+            if ($value[0] === $callback) {
+                unset($evts[$key]);
+            }
         }
 
-        return false;
+        self::$events[$name] = $evts;
+        $evts = null;
     }
 
     public static function buffer($callback = null, $chunksize = 0, $flags = PHP_OUTPUT_HANDLER_STDFLAGS)
@@ -111,8 +110,10 @@ class App
     public static function stop($code, $msg = null)
     {
         Response::status($code, true);
+
         self::trigger('changestatus', array($code, $msg));
         self::trigger('finish');
+
         exit;
     }
 

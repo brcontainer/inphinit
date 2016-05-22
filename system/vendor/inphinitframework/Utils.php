@@ -132,7 +132,7 @@ function UtilsAutoload()
 
         $files = $isfile ? array( $path . $base ) : array( $path . $base . '.php', $path . $base . '.hh' );
 
-        $files = array_filter($files, 'is_file');
+        $files = array_values(array_filter($files, 'is_file'));
 
         if (isset($files[0]) && UtilsCaseSensitivePath($files[0])) {
             include_once $files[0];
@@ -170,4 +170,3 @@ function UtilsConfig()
     register_shutdown_function('UtilsShutDown');
     set_error_handler('UtilsError', E_ALL|E_STRICT);
 }
-

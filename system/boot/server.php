@@ -13,16 +13,16 @@ if (defined('INPHINIT_RUNNING_SERVER')) {
     exit;
 }
 
-$currentPath = realpath(dirname(__FILE__) . '/../');
-$currentPath = rtrim(strtr($currentPath, '\\', '/'), '/') . '/';
+$serverPath = realpath(dirname(__FILE__) . '/../../');
+$serverPath = rtrim(strtr($serverPath, '\\', '/'), '/') . '/';
 
 $path = urldecode(preg_replace('#\?(.*)$#', '', $_SERVER['REQUEST_URI']));
 $path = ltrim($path, '/');
 
 define('INPHINIT_RUNNING_SERVER', true);
 
-if ($path !== '/' && file_exists($currentPath . $path)) {
+if ($path !== '/' && file_exists($serverPath . $path)) {
     return false;
 }
 
-require_once $currentPath . 'index.php';
+require_once $serverPath . 'index.php';

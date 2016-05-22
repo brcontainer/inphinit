@@ -11,7 +11,7 @@ namespace Experimental;
 
 class Rest
 {
-    public function __construct($route, $controller)
+    public function __construct($controller)
     {
         /*
         GET    /photo  index        index
@@ -23,6 +23,11 @@ class Rest
         PATCH  /photo/{photo}       update
         DELETE /photo/{photo}       destroy
         */
+    }
+
+    public static function instance()
+    {
+        return new self($namecontroller);
     }
 
     public function allow(array $methods)

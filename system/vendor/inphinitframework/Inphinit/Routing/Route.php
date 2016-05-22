@@ -17,12 +17,8 @@ class Route extends Router
     public static function set($method, $path, $action)
     {
         if (is_array($method)) {
-            if (is_array($method)) {
-                $method = array_filter($method, 'ctype_alpha');
-
-                foreach ($method as $value) {
-                    self::set($value, $path, $action);
-                }
+            foreach ($method as $value) {
+                self::set($value, $path, $action);
             }
         } elseif (ctype_alpha($method) && is_string($path) && ($action !== null || is_string($action))) {
             $verb = strtoupper(trim($method)) . ' ' . parent::$prefixPath . $path;

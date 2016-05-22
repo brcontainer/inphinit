@@ -41,7 +41,7 @@ class Request
                 return strcasecmp(self::header('X-Requested-With'), 'xmlhttprequest') === 0;
 
             case 'pjax':
-                return strcasecmp(self::header('X-PJAX'), 'true') === 0;
+                return strcasecmp(self::header('X-Pjax'), 'true') === 0;
         }
 
         return strcasecmp($_SERVER['REQUEST_METHOD'], $check) === 0;
