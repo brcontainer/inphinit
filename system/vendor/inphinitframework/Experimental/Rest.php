@@ -25,9 +25,9 @@ class Rest
         */
     }
 
-    public static function instance()
+    public static function create()
     {
-        return new self($namecontroller);
+        return new static;
     }
 
     public function allow(array $methods)

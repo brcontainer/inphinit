@@ -24,6 +24,7 @@ class Helper
                 'extra' => empty($match[5]) === false ? $match[5] : null
             );
         }
+
         return false;
     }
 

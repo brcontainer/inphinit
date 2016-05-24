@@ -9,12 +9,12 @@
 
 use Inphinit\App;
 
-define('INIT_APP', microtime(true));
+define('INPHINIT_START', microtime(true));
 define('ROOT_PATH', rtrim(strtr(dirname(__FILE__), '\\', '/'), '/') . '/');
 define('INPHINIT_PATH', ROOT_PATH . 'system/');
 define('INPHINIT_COMPOSER', false);
 
-require_once INPHINIT_PATH . 'boot/autoload.php';
+require_once INPHINIT_PATH . 'boot/start.php';
 
 if (App::env('developer') === true) {
     require_once INPHINIT_PATH . 'dev.php';

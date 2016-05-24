@@ -7,9 +7,6 @@
  * Released under the MIT license
  */
 
-define('REQUEST_TIME', time());
-define('EOL', chr(10));
-
 require_once INPHINIT_PATH . 'vendor/inphinitframework/Utils.php';
 
 if (INPHINIT_COMPOSER) {

@@ -1,14 +1,13 @@
 #!/usr/bin/env php
 <?php
-define('INIT_APP', microtime());
+define('INPHINIT_START', microtime());
 define('ROOT_PATH', rtrim(strtr(dirname(dirname(__FILE__)), '\\', '/'), '/') . '/');
 define('INPHINIT_PATH', ROOT_PATH . 'system/');
 define('INPHINIT_COMPOSER', false);
-define('INPHINIT_FALLBACK', false);
 
-require_once INPHINIT_PATH . 'boot/autoload.php';
+require_once INPHINIT_PATH . 'boot/start.php';
 
-if (Experimental\Shell::cli() === false) {
+if (Experimental\Shell::isCli() === false) {
     echo 'It\'s not allowed in webservers';
     exit;
 }

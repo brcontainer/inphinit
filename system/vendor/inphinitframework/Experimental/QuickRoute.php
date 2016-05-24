@@ -23,16 +23,16 @@ class QuickRoute extends Router
     const SLASH = 2;
     const NOSLASH = 3;
 
-    public static function instance($namecontroller)
+    public static function create($namecontroller)
     {
-        return new self($namecontroller);
+        return new static($namecontroller);
     }
 
     public function __construct($namecontroller)
     {
         $this->format = QuickRoute::BOTH;
 
-        $controller = self::$prefixNS . strtr($namecontroller, '.', '\\');
+        $controller = parent::$prefixNS . strtr($namecontroller, '.', '\\');
         $fc = '\\Controller\\' . $controller;
 
         if (class_exists($fc) === false) {
@@ -40,7 +40,7 @@ class QuickRoute extends Router
         }
 
         $this->classMethods = get_class_methods($fc);
-        $this->controller   = $controller;
+        $this->controller   = $namecontroller;
 
         App::on('init', array($this, 'prepare'));
 

@@ -160,6 +160,9 @@ function UtilsError($type, $message, $file, $line, $details)
 
 function UtilsConfig()
 {
+    define('REQUEST_TIME', time());
+    define('EOL', chr(10));
+
     App::config('config');
 
     $dev = App::env('developer') === true;

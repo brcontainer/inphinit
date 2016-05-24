@@ -13,9 +13,7 @@ class Exception extends \ErrorException
 {
     public static function raise($message, $level = 1, $type = E_ERROR)
     {
-        $caller = get_called_class();
-        $data   = Debug::caller($level);
-
-        throw new $caller($message, $type, 0, $data['file'], $data['line']);
+        $data = Debug::caller($level);
+        throw new static($message, $type, 0, $data['file'], $data['line']);
     }
 }

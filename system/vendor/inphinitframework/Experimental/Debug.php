@@ -54,7 +54,7 @@ class Debug
             return null;
         }
 
-        $data = self::details($message, $file, $file);
+        $data = self::details($message, $file, $line);
 
         $nhs = !headers_sent();
 
@@ -155,7 +155,7 @@ class Debug
             'usage' => memory_get_usage() / 1024,
             'peak'  => memory_get_peak_usage() / 1024,
             'real'  => memory_get_peak_usage(true) / 1024,
-            'time'  => microtime(true) - INIT_APP
+            'time'  => microtime(true) - INPHINIT_START
         );
     }
 

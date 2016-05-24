@@ -13,6 +13,7 @@ App::on('changestatus', function ($status, $msg) {
             'title'  => $msg ? $msg : 'Página inacessível',
             'method' => $_SERVER['REQUEST_METHOD'],
             'path'   => Request::path(),
+            'route'  => Request::path(true),
             'status' => $status
         ));
         exit;
