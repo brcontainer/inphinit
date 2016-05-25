@@ -7,7 +7,7 @@
  * Released under the MIT license
  */
 
-namespace Experimental;
+namespace Experimental\Routing;
 
 use Inphinit\App;
 use Inphinit\Request;
@@ -16,24 +16,26 @@ use Inphinit\Routing\Router;
 /*
     Usage examples:
 
+    use Experimental\Routing\Group;
+
     //Group by path, navigate to http://[server]/foo/bar
-    RouteGroup::create()->path('/foo/')->call(function () {
+    Group::create()->path('/foo/')->call(function () {
         Route::set('GET', '/bar', 'Controller:action');
     });
 
     //Group by path with regexp, navite http://[server]/something/baz
-    RouteGroup::create()->path('re:#^/([a-z]+)/#ui')->call(function ($arg1) {
+    Group::create()->path('re:#^/([a-z]+)/#ui')->call(function ($arg1) {
         Route::set('GET', '/baz', 'Controller:action');
     });
 
     //Group by subdomain, navite http://[server]/something/baz
-    RouteGroup::create()->domain('re:#^([a-z]+)\.server\.io$#i')->call(function ($arg1) {
+    Group::create()->domain('re:#^([a-z]+)\.server\.io$#i')->call(function ($arg1) {
         Route::set('GET', '/baz', 'Controller:action');
     });
 
 
     //Combined group subdomain+path
-    RouteGroup::create()
+    Group::create()
         ->domain('re:#^([a-z]+)\.server\.io$#i')
         ->path('re:#/([a-z]+)/$#i')
         ->call(function ($userDomain, $path) {
@@ -41,7 +43,7 @@ use Inphinit\Routing\Router;
         });
 */
 
-class RouteGroup extends Router
+class Group extends Router
 {
     private $ready = false;
     private $domain;

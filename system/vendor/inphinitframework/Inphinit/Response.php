@@ -206,7 +206,7 @@ class Response
             $this->fileinf = false;
             $this->output  = null;
 
-            App::off('beforefinish', array($this, 'show'));
+            App::off('ready', array($this, 'show'));
         }
     }
 }

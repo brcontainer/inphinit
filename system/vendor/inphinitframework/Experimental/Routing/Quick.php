@@ -7,12 +7,20 @@
  * Released under the MIT license
  */
 
-namespace Experimental;
+namespace Experimental\Routing;
 
 use Inphinit\App;
+use Inphinit\Helper;
+use Inphinit\Routing\Route;
 use Inphinit\Routing\Router;
 
-class QuickRoute extends Router
+/*
+use Experimental\Routing\Quick;
+
+Quick::create('Namespace.level2.classname');
+*/
+
+class Quick extends Router
 {
     private $classMethods = array();
     private $controller;
@@ -30,7 +38,7 @@ class QuickRoute extends Router
 
     public function __construct($namecontroller)
     {
-        $this->format = QuickRoute::BOTH;
+        $this->format = Quick::BOTH;
 
         $controller = parent::$prefixNS . strtr($namecontroller, '.', '\\');
         $fc = '\\Controller\\' . $controller;
@@ -39,12 +47,34 @@ class QuickRoute extends Router
             Exception::raise('Invalid class ' . $fc);
         }
 
-        $this->classMethods = get_class_methods($fc);
+        $this->classMethods = self::parseVerbs(get_class_methods($fc));
+
         $this->controller   = $namecontroller;
 
         App::on('init', array($this, 'prepare'));
 
         return $this;
+    }
+
+    private static function parseVerbs($methods)
+    {
+        $list = array();
+
+        foreach ($methods as $value) {
+            $verb = array();
+
+            if (preg_match('#^(any|get|post|patch|put|head|delete|options|trace|connect)([a-zA-Z0-9_]+)$#', $value, $verb) > 0) {
+                if (strcasecmp('index', $verb[2]) === 0) {
+                    $verb[2] = '';
+                } else {
+                    //Next update: Convert camelCase to camel-case
+                }
+
+                $list[] = array(strtoupper($verb[1]), strtolower($verb[2]), $value);
+            }
+        }
+
+        return $list;
     }
 
     public function allow(array $classMethods)
@@ -76,7 +106,7 @@ class QuickRoute extends Router
 
     public function prepare()
     {
-        if ($this->ready === false) {
+        if ($this->ready) {
             return null;
         }
 
@@ -87,12 +117,12 @@ class QuickRoute extends Router
         $classMethods = $this->classMethods;
 
         foreach ($classMethods as $value) {
-            if ($format === self::BOTH || $format === self::SLASH) {
-                Route::set('ANY', '/' . $value . '/', $controller . ':' . $value);
+            if ($value[1] !== '' && ($format === self::BOTH || $format === self::SLASH)) {
+                Route::set($value[0], '/' . $value[1] . '/', $controller . ':' . $value[2]);
             }
 
             if ($format === self::BOTH || $format === self::NOSLASH) {
-                Route::set('ANY', '/' . $value, $controller . ':' . $value);
+                Route::set($value[0], '/' . $value[1], $controller . ':' . $value[2]);
             }
         }
 
