@@ -52,8 +52,6 @@ class Quick extends Router
         $this->controller   = $namecontroller;
 
         App::on('init', array($this, 'prepare'));
-
-        return $this;
     }
 
     private static function parseVerbs($methods)
