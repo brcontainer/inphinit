@@ -10,9 +10,10 @@
 namespace Experimental\Routing;
 
 use Inphinit\App;
-use Inphinit\Helper;
 use Inphinit\Routing\Route;
 use Inphinit\Routing\Router;
+
+use Experimental\Exception;
 
 /*
 use Experimental\Routing\Quick;
@@ -23,6 +24,7 @@ Quick::create('Namespace.level2.classname');
 class Quick extends Router
 {
     private $classMethods = array();
+    private $fullController;
     private $controller;
     private $format;
     private $ready = false;
@@ -44,12 +46,13 @@ class Quick extends Router
         $fc = '\\Controller\\' . $controller;
 
         if (class_exists($fc) === false) {
-            Exception::raise('Invalid class ' . $fc);
+            Exception::raise('Invalid class ' . $fc, 2);
         }
 
         $this->classMethods = self::parseVerbs(get_class_methods($fc));
 
-        $this->controller   = $namecontroller;
+        $this->controller = $namecontroller;
+        $this->fullController = $fc;
 
         App::on('init', array($this, 'prepare'));
     }
@@ -75,20 +78,6 @@ class Quick extends Router
         return $list;
     }
 
-    public function allow(array $classMethods)
-    {
-        $this->classMethods = array_diff($this->classMethods, $classMethods);
-
-        return $this;
-    }
-
-    public function disallow(array $classMethods)
-    {
-        $this->classMethods = array_diff($this->classMethods, $classMethods);
-
-        return $this;
-    }
-
     public function canonical($slash = null)
     {
         switch ($slash) {
@@ -109,6 +98,10 @@ class Quick extends Router
         }
 
         $this->ready = true;
+
+        if (empty($this->classMethods)) {
+            Exception::raise($this->fullController . ' is empty ', 2);
+        }
 
         $format       = $this->format;
         $controller   = $this->controller;

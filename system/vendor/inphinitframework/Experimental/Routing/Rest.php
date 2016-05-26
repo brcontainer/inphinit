@@ -9,34 +9,98 @@
 
 namespace Experimental\Routing;
 
-class Rest
+use Inphinit\App;
+use Inphinit\Routing\Route;
+use Inphinit\Routing\Router;
+
+use Experimental\Exception;
+
+/*
+usage:
+
+    use Experimental\Routing\Rest;
+
+    Rest::create('RestControllerClass');
+
+Group:
+
+    Group::create()->path('/foo/')->call(function () {
+        Rest::create('RestControllerClass');
+    });
+*/
+
+class Rest extends Router
 {
-    public function __construct($controller)
+    private $controller;
+    private $fullController;
+    private $classMethods = array();
+    private $valids;
+    private $ready = false;
+
+    public static function create($namecontroller)
     {
-        /*
-        GET    /photo  index        index
-        GET    /photo/create        create
-        POST   /photo               store
-        GET    /photo/{photo}       show
-        GET    /photo/{photo}/edit  edit
-        PUT    /photo/{photo}       update
-        PATCH  /photo/{photo}       update
-        DELETE /photo/{photo}       destroy
-        */
+        return new static($namecontroller);
     }
 
-    public static function create()
+    public function __construct($namecontroller)
     {
-        return new static;
+        $controller = parent::$prefixNS . strtr($namecontroller, '.', '\\');
+        $fc = '\\Controller\\' . $controller;
+
+        if (class_exists($fc) === false) {
+            Exception::raise('Invalid class ' . $fc, 2);
+        }
+
+        $this->valids = array(
+            'index'   => array( 'GET', '/' ),
+            'create'  => array( 'GET', '/create' ),
+            'store'   => array( 'POST', '/' ),
+            'show'    => array( 'GET', 're:#^/([a-z0-9_\-]+)$#i' ),
+            'edit'    => array( 'GET', 're:#^/([a-z0-9_\-]+)/edit$#i' ),
+            'update'  => array( array('PUT', 'PATCH'), 're:#^/([a-z0-9_\-]+)$#i' ),
+            'destroy' => array( 'DELETE', 're:#^/([a-z0-9_\-]+)$#i' ),
+        );
+
+        $this->controller = $namecontroller;
+        $this->fullController = $fc;
+
+        $allowedMethods = array_keys($this->valids);
+
+        $this->classMethods = array_intersect(get_class_methods($fc), $allowedMethods);
+
+        App::on('init', array($this, 'prepare'));
     }
 
-    public function allow(array $methods)
+    public function prepare()
     {
-        //
+        if ($this->ready) {
+            return null;
+        }
+
+        $this->ready = true;
+
+        if (empty($this->classMethods)) {
+            Exception::raise($this->fullController . ' is empty ', 2);
+        }
+
+        $controller   = $this->controller;
+        $classMethods = $this->classMethods;
+
+        foreach ($classMethods as $value) {
+            $route = $this->getRoute($value);
+
+            if ($route) {
+                Route::set($route[0], $route[1], $controller . ':' . $value);
+            }
+        }
     }
 
-    public function disallow(array $methods)
+    private function getRoute($methodName)
     {
-        //
+        if (empty($this->valids[$methodName])) {
+            return false;
+        }
+
+        return $this->valids[$methodName];
     }
 }
