@@ -52,8 +52,8 @@ class App
             self::$detectError = true;
         }
 
-        foreach ($listen as $value) {
-            call_user_func_array($value[0], empty($args) ? $value[1] : $args);
+        foreach ($listen as $callback) {
+            call_user_func_array($callback, empty($args) ? array() : $args);
         }
 
         $listen = null;
@@ -64,7 +64,7 @@ class App
         return self::$detectError;
     }
 
-    public static function on($name, $callback, array $defaultArgs = array())
+    public static function on($name, $callback)
     {
         if (is_string($name) === false || is_callable($callback) === false) {
             return false;
@@ -74,7 +74,7 @@ class App
             self::$events[$name] = array();
         }
 
-        self::$events[$name][] = array($callback, $defaultArgs);
+        self::$events[$name][] = $callback;
     }
 
     public static function off($name, $callback = null)

@@ -21,7 +21,7 @@ App::on('changestatus', function ($status, $msg) {
 });
 
 Route::set('ANY', '/', 'Home:index');
-Route::set('ANY', 're:#/user/([a-z0-9_]+)$#', 'Users.Profile:view');
+Route::set('ANY', 're:#^/user/([a-z0-9_]+)$#', 'Users.Profile:view');
 
 // Navitate to http://[server]/info
 Route::set('ANY', '/info', 'Examples:info');
