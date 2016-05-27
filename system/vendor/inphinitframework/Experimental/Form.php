@@ -7,7 +7,7 @@
  * Released under the MIT license
  */
 
-namespace Inphinit;
+namespace Experimental;
 
 class Form
 {

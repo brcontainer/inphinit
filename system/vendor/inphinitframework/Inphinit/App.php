@@ -53,7 +53,7 @@ class App
         }
 
         foreach ($listen as $callback) {
-            call_user_func_array($callback, empty($args) ? array() : $args);
+            call_user_func_array($callback, $args);
         }
 
         $listen = null;
@@ -89,7 +89,7 @@ class App
         $evts = self::$events[$name];
 
         foreach ($evts as $key => $value) {
-            if ($value[0] === $callback) {
+            if ($value === $callback) {
                 unset($evts[$key]);
             }
         }
@@ -144,11 +144,7 @@ class App
 
             $run = new $mainController;
 
-            if (empty($route['args'])) {
-                $run->$action();
-            } else {
-                call_user_func_array(array($run, $action), $route['args']);
-            }
+            call_user_func_array(array($run, $action), is_array($route['args']) ? $route['args'] : array());
 
             $run = null;
         } else {

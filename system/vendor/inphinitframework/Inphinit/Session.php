@@ -45,4 +45,10 @@ class Session
             session_write_close();
         }
     }
+
+    public static function get($key, $alternative = false)
+    {
+        $data = Helper::arrayPath($key, $_SESSION);
+        return $data === false ? $alternative : $data;
+    }
 }
