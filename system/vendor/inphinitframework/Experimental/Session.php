@@ -7,7 +7,7 @@
  * Released under the MIT license
  */
 
-namespace Inphinit;
+namespace Experimental;
 
 class Session
 {
@@ -21,7 +21,7 @@ class Session
             AppData::createCommomFolders();
 
             $this->path(AppData::storagePath() . '/session');
-            $this->name('diminish');
+            $this->name('inphinit');
 
             session_start();
 
