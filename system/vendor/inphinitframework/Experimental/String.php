@@ -14,12 +14,14 @@ class String
     protected $str = '';
     protected $strLenght = 0;
 
-    public function __construct($str)
+    public function __construct($str, $encoding = null)
     {
+        $this->encoding = empty($encoding) ? mb_internal_encoding() : $encoding;
+
         $str = '' . $str;
 
         $this->str = $str;
-        $this->strLenght = strlen($str);
+        $this->updateLength();
     }
 
     public function __toString()
@@ -27,11 +29,14 @@ class String
         return $this->str;
     }
 
-    public function __get($name)
+    private function updateLength()
     {
-        if ($name === 'length') {
-            return $this->strLenght;
-        }
+        $this->strLenght = mb_strlen($this->str, $this->encoding);
+    }
+
+    public function length()
+    {
+        return $this->strLenght;
     }
 
     public function cut($limit)
@@ -39,18 +44,9 @@ class String
         return $this;
     }
 
-    public function invert()
+    public function reverse()
     {
-        return $this;
-    }
-
-    public function plural()
-    {
-        return $this;
-    }
-
-    public function singular()
-    {
+        $this->str = mb_strrev($this->str, $this->encoding);
         return $this;
     }
 

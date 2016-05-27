@@ -4,6 +4,10 @@ use Inphinit\View;
 use Inphinit\Request;
 use Inphinit\Routing\Route;
 
+App::on('terminate', function() {
+    echo memory_get_peak_usage() / 1024;
+});
+
 App::on('changestatus', function ($status, $msg) {
     if ($status === 503) {
         echo 'This site is currently down for maintenance and should be back soon!';

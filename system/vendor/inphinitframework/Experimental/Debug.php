@@ -39,9 +39,9 @@ class Debug
             return null;
         }
 
-        App::off('error',     array( '\\Experimental\\Debug', 'error' ));
-        App::off('terminate', array( '\\Experimental\\Debug', 'performance' ));
-        App::off('terminate', array( '\\Experimental\\Debug', 'classes' ));
+        App::off('error',     array( '\\Experimental\\Debug', 'renderError' ));
+        App::off('terminate', array( '\\Experimental\\Debug', 'renderPerformance' ));
+        App::off('terminate', array( '\\Experimental\\Debug', 'renderClasses' ));
 
         ini_set('display_errors', self::$displayErrors);
 
@@ -56,9 +56,7 @@ class Debug
 
         $data = self::details($message, $file, $line);
 
-        $nhs = !headers_sent();
-
-        if ($nhs && Request::is('xhr')) {
+        if (!headers_sent() && Request::is('xhr')) {
             ob_start();
 
             self::unregister();
@@ -100,29 +98,20 @@ class Debug
             Exception::raise($view . ' view is not found', 2);
         }
 
-        $data = array( '\\Experimental\\Debug', 'render' . ucfirst($type) );
+        $callRender = array( '\\Experimental\\Debug', 'render' . ucfirst($type) );
 
         switch ($type) {
             case 'error':
                 self::$views[$type] = $view;
-
-                if ($data) {
-                    App::on('error', $data);
-                } else {
-                    App::off('error', $data);
-                }
+                App::on('error', $callRender);
             break;
 
             case 'classes':
             case 'performance':
                 self::$views[$type] = $view;
-
-                if ($data) {
-                    App::on('terminate', $data);
-                } else {
-                    App::off('terminate', $data);
-                }
+                App::on('terminate', $callRender);
             break;
+
             default:
                 Exception::raise($type . ' is not valid event', 2);
         }

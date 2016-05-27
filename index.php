@@ -10,8 +10,8 @@
 use Inphinit\App;
 
 define('INPHINIT_START', microtime(true));
-define('ROOT_PATH', rtrim(strtr(dirname(__FILE__), '\\', '/'), '/') . '/');
-define('INPHINIT_PATH', ROOT_PATH . 'system/');
+define('INPHINIT_ROOT', rtrim(strtr(dirname(__FILE__), '\\', '/'), '/') . '/');
+define('INPHINIT_PATH', INPHINIT_ROOT . 'system/');
 define('INPHINIT_COMPOSER', false);
 
 require_once INPHINIT_PATH . 'boot/start.php';
