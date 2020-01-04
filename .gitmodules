@@ -1,0 +1,3 @@
+[submodule "lib"]
+    path = system/vendor/inphinit/framework
+    url = https://github.com/inphinit/framework.git
